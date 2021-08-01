@@ -64,6 +64,10 @@ local allowed = {
 function MenuBackgrounds:LoadTextures()
 	self._files = {}
 	local set = self.Options:GetValue("BGsSet")
+	if set ~= self._last_set then
+		self._last = nil
+	end
+	self._last_set = set
 	if not table.contains(self.Sets, set) then
 		self.Options:SetValue("BGsSet", self.Sets[1])
 		set = self.Sets[1]
@@ -149,32 +153,50 @@ function MenuBackgrounds:AddBackground(bg, pnl, layer)
 		return false
 	end
 
-	if alive(pnl:child("bg_mod")) then
-		pnl:remove(pnl:child("bg_mod"))
-	end
-	local file, ext = self:GetBackgroundFile(bg)
+	local file, ext, in_ext = self:GetBackgroundFile(bg)
+
 	if not file then
 		return false
 	end
-	if ext == "movie" then
-		pnl:video({
+
+	local is_movie = in_ext == "movie"
+	if not self._reload and (self._last and self._last.is_movie and alive(self._last.bg_mod) and self._last.file == file) then
+		self._last.bg_mod:set_volume_gain(self.Options:GetValue("Volume"))
+		return true
+	end
+
+	if self._last and alive(self._last.bg_mod) then
+		self._last.bg_mod:parent():remove(self._last.bg_mod)
+	end
+
+	if alive(pnl:child("bg_mod")) then
+		pnl:remove(pnl:child("bg_mod"))
+	end
+
+	local bg_mod
+	if is_movie then
+		bg_mod = pnl:video({
 			name = "bg_mod",
 			w = 1920,
 			h = 1080,
 			video = file,
 			loop = true,
+			speed = self.Options:GetValue("Speed"),
 			layer = layer or 1
 		})
+		bg_mod:set_volume_gain(self.Options:GetValue("Volume"))
 	else
-		pnl:bitmap({
+		bg_mod = pnl:bitmap({
 		    name = "bg_mod",
 		    texture = file,
-			render_template = "BackgroundTextured",
 			w = 1920,
 			h = ext == "png" and 1920 or 1080, -- I have no idea why pngs act this way but they just do.
 		    layer = layer or 1
 		})
 	end
+
+	self._last = {file = file, pnl = pnl, bg_mod = bg_mod, is_movie = is_movie}
+
 	self:AddUpdate(orig_pnl, bg, layer)
 	return true
 end
@@ -195,6 +217,24 @@ function MenuBackgrounds:UpdateSetsItem()
 			item:set_value(set)
 		end
 	end
+end
+
+function MenuBackgrounds:UpdateWait()
+	BeardLib:AddDelayedCall("StopSpammingMyEarsMenuBgs", 0.25, function()
+		self:Update()
+	end)
+end
+
+function MenuBackgrounds:ReloadWait()
+	BeardLib:AddDelayedCall("StopSpammingMyEarsMenuBgs", 0.25, function()
+		self:Reload()
+	end)
+end
+
+function MenuBackgrounds:Reload()
+	self._reload = true
+	self:Update()
+	self._reload = nil
 end
 
 function MenuBackgrounds:Update()

@@ -68,19 +68,17 @@ function MenuSceneManager:SetBackground()
 	if self._last_bg == self._current_scene_template then
 		return
 	end
-	if alive(self._background_ws) and alive(self._background_ws:panel():child("bg")) then
-		self._background_ws:panel():remove(self._background_ws:panel():child("bg"))
-	end
+	local panel = self._background_ws:panel():child("bg") or self._background_ws:panel():panel({
+		name = "bg",
+		layer = 2000000
+	})
 	self._last_bg = self._current_scene_template
 	local enabled = MenuBackgrounds.Options:GetValue("Menus/"..self._last_bg)
 	if enabled then
-		local panel = self._background_ws:panel():panel({
-			name = "bg",
-			layer = 2000000
-		})
 		local success = MenuBackgrounds:AddBackground(self._last_bg, panel)
 		self:SetUnwantedVisible(not success)
 	else
 		self:SetUnwantedVisible(true)
+		self._background_ws:remove(panel)
 	end
 end
