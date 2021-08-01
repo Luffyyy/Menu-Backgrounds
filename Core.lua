@@ -1,0 +1,209 @@
+MenuBackgrounds.Menus = {
+	 -- Copied from MenuSceneManagerVR
+	"standard",
+	"blackmarket",
+	"blackmarket_mask",
+	"infamy_preview",
+	"blackmarket_item",
+	"character_customization",
+	"play_online",
+	"options",
+	"lobby",
+	--"lobby1",
+	--"lobby2",
+	--"lobby3",
+	--"lobby4",
+	"inventory",
+	"blackmarket_crafting",
+	"blackmarket_weapon_color",
+	"safe",
+	"blackmarket_customize",
+	"blackmarket_character",
+	"blackmarket_customize_armour",
+	"blackmarket_armor",
+	"blackmarket_screenshot",
+	"crime_spree_lobby",
+	"crew_management",
+	"blackmarket_item",
+	"movie_theater",
+
+	-- Custom
+	"crimenet",
+	"briefing",
+	"blackscreen",
+	"endscreen",
+	"loot",
+	"loading"
+}
+
+function MenuBackgrounds:Init()
+	self.AssetsPath = Path:Combine(self.ModPath, "Assets")
+	self.Sets = self.Sets or {}
+	self.Updaters = {}
+
+	MenuBackgrounds:LoadSets()
+	MenuBackgrounds:LoadTextures()
+end
+
+function MenuBackgrounds:LoadSets()
+	self.Sets = {}
+	for _, set in pairs(FileIO:GetFolders(self.AssetsPath)) do
+		table.insert(self.Sets, set)
+	end
+end
+
+local allowed = {
+	png = true,
+	dds = true,
+	texture = true,
+	tga = true,
+	movie = true,
+	bik = true
+}
+
+function MenuBackgrounds:LoadTextures()
+	self._files = {}
+	local set = self.Options:GetValue("BGsSet")
+	if not table.contains(self.Sets, set) then
+		self.Options:SetValue("BGsSet", self.Sets[1])
+		set = self.Sets[1]
+	end
+	local ids_strings = {}
+	local set_path = Path:Combine(self.AssetsPath, set)
+	local config = FileIO:ReadScriptData(Path:Combine(set_path, "config.json"), "json")
+	for _, file in pairs(FileIO:GetFiles(set_path)) do
+		local ext, name = Path:GetFileExtension(file), Path:GetFilePathNoExt(file)
+		if allowed[ext] then
+			local path = Path:Combine(set_path, file)
+			local in_path = "guis/textures/backgrounds/" .. name
+			local in_ext = (ext == "movie" or ext == "bik") and "movie" or "texture"
+
+			table.insert(ids_strings, Idstring(in_path))
+			DB:create_entry(in_ext:id(), in_path:id(), path)
+			self._files[name] = {in_path = in_path, in_ext = in_ext, path = path, ext = ext}
+		end
+	end
+
+	if config then
+		if config.overrides then
+			for k, v in pairs(config.overrides) do
+				if self._files[v] then
+					self._files[k] = self._files[v]
+				else
+					self:Err("[config.json] Background named %s was not found, cannot add override backgrounds.", v)
+				end
+			end
+		end
+		self._fallback = NotNil(config.fallback, "standard")
+	else
+		self._fallback = "standard"
+	end
+
+	Application:reload_textures(ids_strings)
+	if managers.menu_scene then
+		managers.menu_scene:RefreshBackground()
+	end
+end
+
+function MenuBackgrounds:AddUpdate(pnl, bg, layer)
+	self.Updaters[bg] = {pnl = pnl, layer = layer}
+end
+
+function MenuBackgrounds:HidePanel()
+	self.MainPanel:set_visible(false)
+end
+
+local default = {in_path = "guis/textures/backgrounds/standard", ext = "png", in_ext = "texture"}
+
+function MenuBackgrounds:GetBackgroundFile(bg)
+	bg = self.Options:GetValue("UseStandard") and "standard" or bg
+	if bg:begins("blackmarket") and not self._files[bg] then
+		bg = "blackmarket_all"
+	end
+
+	local file_tbl = self._files[bg]
+	if not file_tbl then
+		if self._fallback then
+			file_tbl = self._files[self._fallback]
+		else
+			return nil, nil
+		end
+	end
+
+	local file = file_tbl.in_path
+	if not DB:has(file_tbl.in_ext:id(), file:id()) then
+		file = default.in_path
+	end
+	return file, file_tbl.ext
+end
+
+function MenuBackgrounds:AddBackground(bg, pnl, layer)
+	local orig_pnl = pnl
+	if pnl and pnl:alive() then
+		self.MainPanel:set_visible(false)
+	elseif self.MainPanel and self.MainPanel:alive() then
+		pnl = self.MainPanel
+		self.MainPanel:set_visible(true)
+		self.MainPanel:set_alpha(1)
+	else
+		return false
+	end
+
+	if alive(pnl:child("bg_mod")) then
+		pnl:remove(pnl:child("bg_mod"))
+	end
+	local file, ext = self:GetBackgroundFile(bg)
+	if not file then
+		return false
+	end
+	if ext == "movie" then
+		pnl:video({
+			name = "bg_mod",
+			w = 1920,
+			h = 1080,
+			video = file,
+			loop = true,
+			layer = layer or 1
+		})
+	else
+		pnl:bitmap({
+		    name = "bg_mod",
+		    texture = file,
+			render_template = "BackgroundTextured",
+			w = 1920,
+			h = ext == "png" and 1920 or 1080, -- I have no idea why pngs act this way but they just do.
+		    layer = layer or 1
+		})
+	end
+	self:AddUpdate(orig_pnl, bg, layer)
+	return true
+end
+
+function MenuBackgrounds:UpdateSetsItem()
+	local item = managers.menu and managers.menu:active_menu().logic:get_item("BGsSet")
+	if item then
+		item:clear_options()
+		for _, set in pairs(self.Sets) do
+			table.insert(item._all_options, CoreMenuItemOption.ItemOption:new({value = set, text_id = set, localize = false}))
+		end
+		item._options = item._all_options
+		local set = self.Options:GetValue("BGsSet")
+		if not table.contains(self.Sets, set) then
+			item:set_value(self.Sets[1])
+			MenuCallbackHandler:MenuBgsClbk(item)
+		else
+			item:set_value(set)
+		end
+	end
+end
+
+function MenuBackgrounds:Update()
+	self:LoadSets()
+	self:UpdateSetsItem()
+	self:LoadTextures()
+	for bg, v in pairs(self.Updaters) do
+		if not self:AddBackground(bg, v.pnl, v.layer) then
+			table.delete(self.Updaters, bg)
+		end
+	end
+end

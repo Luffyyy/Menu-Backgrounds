@@ -1,8 +1,8 @@
 Hooks:PostHook(CrimeNetGui, "init", "MenuBgsInit", function(self)
-	if not MenuBackgrounds.Options.crimenet then
+	if not MenuBackgrounds.Options:GetValue("Menus/crimenet") then
 		return
 	end
-	MenuBackgrounds:AddBackground(self._fullscreen_panel:panel({valign = "scale", halign = "scale"}), "crimenet")
+	MenuBackgrounds:AddBackground("crimenet")
 	self._fullscreen_panel:child("vignette"):hide()
 	self._fullscreen_panel:child("bd_light"):hide()
 	self._fullscreen_panel:child("blur_top"):hide()
@@ -18,7 +18,7 @@ Hooks:PostHook(CrimeNetGui, "init", "MenuBgsInit", function(self)
 end)
 
 Hooks:PostHook(CrimeNetGui, "_create_polylines", "MenuBgsRemovePolyLines", function(self, o, x, y)
-	if not MenuBackgrounds.Options.crimenet then
+	if not MenuBackgrounds.Options:GetValue("Menus/crimenet") then
 		return
 	end
 	if self._region_panel then
