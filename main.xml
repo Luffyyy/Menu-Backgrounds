@@ -33,8 +33,10 @@
             <option name="Volume" type="number" default_value="0.1" min="0" max="1" value_changed="self:UpdateWait" show_value="true"/>
             <option name="Speed" type="number" default_value="1" step="1" decimal_count="0" min="1" max="10" show_value="true" value_changed="self:ReloadWait"/>
             <button name="Reload" clicked="self:Reload"/>
+            <button name="Reset" reset_button="true"/>
 
             <option_group name="Menus">
+                <button name="Reset" reset_button="true"/>
                 <option name="standard" type="boolean" default_value="true"/>
                 <option name="inventory" type="boolean" default_value="true"/>
                 <option name="blackmarket" type="boolean" default_value="true"/>
