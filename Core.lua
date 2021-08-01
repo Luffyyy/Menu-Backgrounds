@@ -134,7 +134,7 @@ function MenuBackgrounds:GetBackgroundFile(bg)
 	if not DB:has(file_tbl.in_ext:id(), file:id()) then
 		file = default.in_path
 	end
-	return file, file_tbl.ext
+	return file, file_tbl.ext, file_tbl.in_ext
 end
 
 function MenuBackgrounds:AddBackground(bg, pnl, layer)

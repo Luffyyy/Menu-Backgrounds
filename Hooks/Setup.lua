@@ -2,8 +2,8 @@ Hooks:PreHook(Setup, "_start_loading_screen", "MenuBackgroundsInjectLoadingData"
     if MenuBackgrounds.Options:GetValue("Menus/loading") then
         if LoadingEnvironment then
             Hooks:PreHook(getmetatable(LoadingEnvironment), "start", "MenuBackgroundsInjectLoadingData", function(self, setup, load, data)
-                local file, ext = MenuBackgrounds:GetBackgroundFile("loading")
-                if not file then
+                local file, ext, in_ext = MenuBackgrounds:GetBackgroundFile("loading")
+                if not file or in_ext == "movie" then
                     return
                 end
                 data.menu_bgs = {

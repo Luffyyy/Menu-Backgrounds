@@ -9,12 +9,13 @@ function script:init(scene_gui, res, progress, base_layer, ...)
         if not MenuBackgrounds.Options:GetValue("Menus/loading") then
             return
         end
-        local file, ext = MenuBackgrounds:GetBackgroundFile("loading")
-        if not file then
+        local file, ext, in_ext = MenuBackgrounds:GetBackgroundFile("loading")
+        if not file or in_ext == "movie" then -- Movies are not supported in loading screens :(
             return
         end
         arg = {
             menu_bgs = {
+                volume = MenuBackgrounds.Options:GetValue("Volume"),
                 file = file,
                 ext = ext
             }
@@ -39,24 +40,13 @@ function script:init(scene_gui, res, progress, base_layer, ...)
             self._bg_gui:hide()
         end
 
-        if arg.menu_bgs.ext == "movie" then
-            self._bg_panel:video({
-                name = "bg_mod",
-                w = 1920,
-			    h = 1080,
-                video = arg.menu_bgs.file,
-                loop = true,
-                layer = base_layer - 1
-            })
-        else
-            self._bg_panel:bitmap({
-                name = "bg_mod",
-                w = 1920,
-                h = arg.menu_bgs.ext == "png" and 1920 or 1080,
-                texture = arg.menu_bgs.file,
-                layer = base_layer - 1
-            })
-        end
+        self._bg_panel:bitmap({
+            name = "bg_mod",
+            w = 1920,
+            h = arg.menu_bgs.ext == "png" and 1920 or 1080,
+            texture = arg.menu_bgs.file,
+            layer = base_layer - 1
+        })
     end
 end
 
