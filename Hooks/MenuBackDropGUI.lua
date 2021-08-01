@@ -10,6 +10,7 @@ function MenuBackdropGUI:set_background(menu)
 	self._panel:child("item_background_layer"):set_alpha(1)
 	self._panel:child("item_foreground_layer"):show()
 	self._panel:child("item_foreground_layer"):set_alpha(1)
+	MenuBackgrounds:ShowPanel()
 	MenuBackgrounds:AddBackground(menu)
 end
 

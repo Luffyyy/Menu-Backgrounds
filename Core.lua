@@ -113,8 +113,20 @@ function MenuBackgrounds:AddUpdate(pnl, bg, layer)
 	self.Updaters[bg] = {pnl = pnl, layer = layer}
 end
 
+function MenuBackgrounds:ShowPanel()
+	self.MainPanel:set_visible(true)
+	self._hidden = false
+	if self._last and self._last.is_movie and alive(self._last.bg_mod) then
+		self._last.bg_mod:set_volume_gain(self.Options:GetValue("Volume"))
+	end
+end
+
 function MenuBackgrounds:HidePanel()
 	self.MainPanel:set_visible(false)
+	self._hidden = true
+	if self._last and self._last.is_movie and alive(self._last.bg_mod) then
+		self._last.bg_mod:set_volume_gain(0)
+	end
 end
 
 local default = {in_path = "guis/textures/backgrounds/standard", ext = "png", in_ext = "texture"}
@@ -147,7 +159,7 @@ function MenuBackgrounds:AddBackground(bg, pnl, layer)
 		self.MainPanel:set_visible(false)
 	elseif self.MainPanel and self.MainPanel:alive() then
 		pnl = self.MainPanel
-		self.MainPanel:set_visible(true)
+		self.MainPanel:set_visible(not self._hidden)
 		self.MainPanel:set_alpha(1)
 	else
 		return false
@@ -160,8 +172,9 @@ function MenuBackgrounds:AddBackground(bg, pnl, layer)
 	end
 
 	local is_movie = in_ext == "movie"
+	local volume = not self._hidden and self.Options:GetValue("Volume") or 0
 	if not self._reload and (self._last and self._last.is_movie and alive(self._last.bg_mod) and self._last.file == file) then
-		self._last.bg_mod:set_volume_gain(self.Options:GetValue("Volume"))
+		self._last.bg_mod:set_volume_gain(volume)
 		return true
 	end
 
@@ -184,7 +197,7 @@ function MenuBackgrounds:AddBackground(bg, pnl, layer)
 			speed = self.Options:GetValue("Speed"),
 			layer = layer or 1
 		})
-		bg_mod:set_volume_gain(self.Options:GetValue("Volume"))
+		bg_mod:set_volume_gain(volume)
 	else
 		bg_mod = pnl:bitmap({
 		    name = "bg_mod",
