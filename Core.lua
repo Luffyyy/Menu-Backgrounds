@@ -142,8 +142,12 @@ function MenuBackgrounds:GetBackgroundFile(bg)
 		if self._fallback then
 			file_tbl = self._files[self._fallback]
 		else
-			return nil, nil
+			return nil, nil, nil
 		end
+	end
+
+	if not file_tbl then
+		return nil, nil, nil
 	end
 
 	local file = file_tbl.in_path
@@ -225,7 +229,6 @@ function MenuBackgrounds:UpdateSetsItem()
 		local set = self.Options:GetValue("BGsSet")
 		if not table.contains(self.Sets, set) then
 			item:set_value(self.Sets[1])
-			MenuCallbackHandler:MenuBgsClbk(item)
 		else
 			item:set_value(set)
 		end
