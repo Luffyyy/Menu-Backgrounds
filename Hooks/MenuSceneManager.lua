@@ -79,6 +79,6 @@ function MenuSceneManager:SetBackground()
 		self:SetUnwantedVisible(not success)
 	else
 		self:SetUnwantedVisible(true)
-		self._background_ws:remove(panel)
+		self._background_ws:panel():remove(panel)
 	end
 end
