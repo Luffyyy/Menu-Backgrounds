@@ -48,7 +48,20 @@ end
 function MenuBackgrounds:LoadSets()
 	self.Sets = {}
 	for _, set in pairs(FileIO:GetFolders(self.AssetsPath)) do
-		table.insert(self.Sets, set)
+		table.insert(self.Sets, {path = Path:Combine(self.AssetsPath, set), name = set})
+	end
+	self:LoaSetsFromMods("assets/mod_overrides")
+	self:LoaSetsFromMods("mods")
+end
+
+function MenuBackgrounds:LoaSetsFromMods(path)
+	for _, mod in pairs(FileIO:GetFolders(path)) do
+		local dir = Path:Combine(path, mod, "menu_backgrounds")
+		if FileIO:Exists(dir) then
+			for _, set in pairs(FileIO:GetFolders(dir)) do
+				table.insert(self.Sets, {path = Path:Combine(dir, set), name = mod .. "/" .. set})
+			end
+		end
 	end
 end
 
@@ -63,17 +76,22 @@ local allowed = {
 
 function MenuBackgrounds:LoadTextures()
 	self._files = {}
-	local set = self.Options:GetValue("BGsSet")
-	if set ~= self._last_set then
+	local saved_set = self.Options:GetValue("BGsSet")
+	if saved_set ~= self._last_set then
 		self._last = nil
 	end
-	self._last_set = set
-	if not table.contains(self.Sets, set) then
-		self.Options:SetValue("BGsSet", self.Sets[1])
-		set = self.Sets[1]
+	self._last_set = saved_set
+
+	local set_path
+	for _, set in pairs(self.Sets) do
+		if set.name == saved_set then
+			set_path = set.path
+		end
 	end
+
+	set_path = set_path or self.Sets[1].path
+	
 	local ids_strings = {}
-	local set_path = Path:Combine(self.AssetsPath, set)
 	local config = FileIO:ReadScriptData(Path:Combine(set_path, "config.json"), "json")
 	for _, file in pairs(FileIO:GetFiles(set_path)) do
 		local ext, name = Path:GetFileExtension(file), Path:GetFilePathNoExt(file)
@@ -229,15 +247,19 @@ function MenuBackgrounds:UpdateSetsItem()
 	local item = managers.menu and managers.menu:active_menu().logic:get_item("BGsSet")
 	if item then
 		item:clear_options()
+		local saved_set = self.Options:GetValue("BGsSet")
+		local found = false
 		for _, set in pairs(self.Sets) do
-			table.insert(item._all_options, CoreMenuItemOption.ItemOption:new({value = set, text_id = set, localize = false}))
+			table.insert(item._all_options, CoreMenuItemOption.ItemOption:new({value = set.name, text_id = set.name, localize = false}))
+			if set.name == saved_set then
+				found = true
+			end
 		end
 		item._options = item._all_options
-		local set = self.Options:GetValue("BGsSet")
-		if not table.contains(self.Sets, set) then
-			item:set_value(self.Sets[1])
+		if found then
+			item:set_value(saved_set)
 		else
-			item:set_value(set)
+			item:set_value(self.Sets[1].name)
 		end
 	end
 end
