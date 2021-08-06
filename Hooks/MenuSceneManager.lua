@@ -7,7 +7,7 @@ function MenuSceneManager:UpdateBackground()
 		return
 	end
 	local w,h = 1920, 1080
-	local a,b,c = cam:position() + Vector3(0, 584, -h/2):rotate_with(cam:rotation()), Vector3(0, w, 0):rotate_with(cam:rotation()) , Vector3(0, 0, h):rotate_with(cam:rotation())
+	local a,b,c = cam:position() + Vector3(-0.5, 584, -h/2+0.5):rotate_with(cam:rotation()), Vector3(0, w, 0):rotate_with(cam:rotation()) , Vector3(0, 0, h):rotate_with(cam:rotation())
 	if alive(self._background_ws) then
 		self._background_ws:set_world(w,h,a,b,c)
 	else
