@@ -113,6 +113,10 @@ function MenuBackgrounds:AddUpdate(pnl, bg, layer)
 	self.Updaters[bg] = {pnl = pnl, layer = layer}
 end
 
+function MenuBackgrounds:SetIgnoreOtherPanels(ignore)
+	self._ignore_other_panel = ignore
+end
+
 function MenuBackgrounds:ShowPanel()
 	self.MainPanel:set_visible(true)
 	self._hidden = false
@@ -158,6 +162,9 @@ function MenuBackgrounds:GetBackgroundFile(bg)
 end
 
 function MenuBackgrounds:AddBackground(bg, pnl, layer)
+	if self._ignore_other_panel and pnl then
+		return true
+	end
 	local orig_pnl = pnl
 	if pnl and pnl:alive() then
 		self.MainPanel:set_visible(false)

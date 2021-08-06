@@ -64,8 +64,8 @@ function MenuSceneManager:RefreshBackground()
 	self._last_bg = nil
 end
 
-function MenuSceneManager:SetBackground()
-	if self._last_bg == self._current_scene_template then
+function MenuSceneManager:SetBackground(force)
+	if self._last_bg == self._current_scene_template and not force then
 		return
 	end
 	local panel = self._background_ws:panel():child("bg") or self._background_ws:panel():panel({
