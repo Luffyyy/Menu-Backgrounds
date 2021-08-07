@@ -1,6 +1,6 @@
 Hooks:PostHook(MenuManager, "init", "InitBGsPanel", function()
     MenuBackgrounds.MainWs = managers.gui_data:create_fullscreen_1080p_workspace()
-    MenuBackgrounds.MainPanel = MenuBackgrounds.MainWs:panel():panel({visible = false})
+    MenuBackgrounds.MainPanel = MenuBackgrounds.MainWs:panel():panel()
 
 	for _, menu in pairs(MenuBackgrounds.Menus) do
 		local pretty = string.pretty(menu)

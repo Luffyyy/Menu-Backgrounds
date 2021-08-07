@@ -145,6 +145,7 @@ end
 
 function MenuBackgrounds:HidePanel()
 	self.MainPanel:set_visible(false)
+	self:SetIgnoreOtherPanels(false)
 	self._hidden = true
 	if self._last and self._last.is_movie and alive(self._last.bg_mod) then
 		self._last.bg_mod:set_volume_gain(0)
