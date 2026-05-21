@@ -32,6 +32,7 @@ MenuBackgrounds.Menus = {
 	"briefing",
 	"blackscreen",
 	"endscreen",
+	"failscreen",
 	"loot",
 	"loading"
 }
@@ -159,6 +160,9 @@ function MenuBackgrounds:GetBackgroundFile(bg)
 	if bg:begins("blackmarket") and not self._files[bg] then
 		bg = "blackmarket_all"
 	end
+	if bg == "failscreen" and not self._files[bg] then
+		bg = "endscreen"
+	end
 
 	local file_tbl = self._files[bg]
 	if not file_tbl then
@@ -202,7 +206,7 @@ function MenuBackgrounds:AddBackground(bg, pnl, layer)
 	end
 
 	local is_movie = in_ext == "movie"
-	local volume = not self._hidden and self.Options:GetValue("Volume") or 0
+	local volume = self.Options:GetValue("Volume")
 	if not self._reload and (self._last and self._last.is_movie and alive(self._last.bg_mod) and self._last.file == file) then
 		self._last.bg_mod:set_volume_gain(volume)
 		return true

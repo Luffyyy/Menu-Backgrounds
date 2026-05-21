@@ -1,7 +1,7 @@
 {
     "name" : "Menu Backgrounds",
-    "description" : "A mod that allows you to have nice backgrounds",
-    "author": "Luffy, Matt(Raining and The Diamond)",
+    "description" : "A mod that allows you to have nicer backgrounds",
+    "author": "Luffy, Matt(Raining and The Diamond), florane(fork)",
     "hooks":[
         {"hook_id":"lib/utils/levelloadingscreenguiscript",  "script_path":"Hooks/LoadingScreen.lua"},
         {"hook_id":"lib/utils/lightloadingscreenguiscript",  "script_path":"Hooks/LoadingScreen.lua"}
