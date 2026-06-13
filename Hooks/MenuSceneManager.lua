@@ -70,7 +70,7 @@ function MenuSceneManager:SetBackground(force)
 	end
 	local panel = self._background_ws:panel():child("bg") or self._background_ws:panel():panel({
 		name = "bg",
-		layer = 2000000
+		layer = 1
 	})
 	self._last_bg = self._current_scene_template
 	local enabled = MenuBackgrounds.Options:GetValue("Menus/"..self._last_bg)
