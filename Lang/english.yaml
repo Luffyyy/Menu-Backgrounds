@@ -17,3 +17,6 @@ MenuBgs_ColorGradingDescID: Color grading is turned off as it messes with the co
 MenuBgs_VolumeTitleID: Animated Background Volume
 MenuBgs_SpeedTitleID: Animated Background Speed
 MenuBgs_ResetTitleID: Reset Settings
+MenuBgs_PlayerEffectsTitleID: Player particle effects
+MenuBgs_PlayerEffectsDescID: Mask effects look ugly on most backgrounds, which is why previously they were fully disabled. If you wish to enable them regardless turn this option on.
+

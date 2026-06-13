@@ -55,7 +55,7 @@ function MenuSceneManager:SetUnwantedVisible(visible)
 			managers.environment_controller._vp:vp():set_post_processor_effect("World", Idstring("bloom_combine_post_processor"), Idstring("bloom_combine_empty"))
 		end
 	end
-	World:effect_manager():set_rendering_enabled(visible or Global.load_level)
+	World:effect_manager():set_rendering_enabled(MenuBackgrounds.Options:GetValue("PlayerEffects") or visible or Global.load_level)
 	managers.environment_controller:set_default_color_grading("color_off", not MenuBackgrounds.Options:GetValue("ColorGrading"))
 	managers.environment_controller:refresh_render_settings()
 end
@@ -82,3 +82,4 @@ function MenuSceneManager:SetBackground(force)
 		self._background_ws:panel():remove(panel)
 	end
 end
+
