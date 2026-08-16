@@ -42,8 +42,11 @@ function script:init(scene_gui, res, progress, base_layer, ...)
 
         self._bg_panel:bitmap({
             name = "bg_mod",
-            w = 1920,
-            h = arg.menu_bgs.ext == "png" and 1920 or 1080,
+            w = 1922,
+            h = 1082,
+            x = -1,
+            y = -1,
+            texture_rect = (arg.menu_bgs.ext == "png" or arg.menu_bgs.ext == "tga") and {0, 0, 1919, 1079} or nil,
             texture = arg.menu_bgs.file,
             layer = base_layer - 1
         })
