@@ -233,13 +233,19 @@ function MenuBackgrounds:AddBackground(bg, pnl, layer)
 		})
 		bg_mod:set_volume_gain(volume)
 	else
-		bg_mod = pnl:bitmap({
-		    name = "bg_mod",
-		    texture = file,
-			w = 1920,
-			h = ext == "png" and 1920 or 1080, -- I have no idea why pngs act this way but they just do.
-		    layer = layer or 1
-		})
+		local params = {
+			name = "bg_mod",
+			texture = file,
+			layer = layer or 1
+		}
+
+		if ext == "png" or ext == "tga" then
+			params.texture_rect = {0, 0, pnl:w() - 1, pnl:h() - 1}
+		end
+
+		bg_mod = pnl:bitmap(params)
+		bg_mod:set_size(pnl:w() + 2, pnl:h() + 2)
+		bg_mod:set_position(-1, -1)
 	end
 
 	self._last = {file = file, pnl = pnl, bg_mod = bg_mod, is_movie = is_movie}
