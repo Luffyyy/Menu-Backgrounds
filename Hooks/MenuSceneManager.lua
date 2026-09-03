@@ -38,6 +38,7 @@ function MenuSceneManager:SetUnwantedVisible(visible)
 		logo,
 		"units/pd2_dlc_shiny/menu_showcase/menu_showcase",
 		"units/payday2_cash/safe_room/cash_int_safehouse_saferoom",
+		"units/menu/menu_scene/menu_solid_bg",
 	}
 	for _, unit in pairs(World:find_units_quick("all")) do 
 		for _, unit_name in pairs(unwanted) do
